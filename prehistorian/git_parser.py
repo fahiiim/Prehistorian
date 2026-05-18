@@ -23,6 +23,7 @@ def is_noise_file(filepath: str) -> bool:
         return True
     return False
 
+
 def get_latest_commit_hash() -> str:
     try:
         result = subprocess.run(
@@ -32,6 +33,7 @@ def get_latest_commit_hash() -> str:
         return result.stdout.strip()
     except subprocess.CalledProcessError:
         return ""
+
 
 def parse_git_history(max_files_per_commit: int = 15) -> List[CommitData]:
     try:
@@ -76,6 +78,7 @@ def parse_git_history(max_files_per_commit: int = 15) -> List[CommitData]:
             commits.append(CommitData(hash=current_hash, files=unique_files))
 
     return commits
+
 
 def get_staged_files() -> List[str]:
     try:

@@ -112,6 +112,7 @@ def train_model(commits: List[CommitData], latest_hash: str) -> PrehistorianMode
 
     return PrehistorianModel(latest_commit_hash=latest_hash, co_change_probabilities=co_change_probs)
 
+
 def save_model(model: PrehistorianModel):
     MODEL_DIR.mkdir(exist_ok=True)
     joblib.dump(model, MODEL_PATH)

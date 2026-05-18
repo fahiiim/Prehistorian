@@ -6,15 +6,14 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 from rich.panel import Panel
 
-from .git_parser import parse_git_history, get_latest_commit_hash, get_staged_files
+from .git_parser import parse_git_history, get_latest_commit_hash, get_staged_files, normalize_path
 from .math_engine import train_model, save_model, load_model
 
 if sys.platform == "win32":
-    import codecs
-    if sys.stdout.encoding.lower() != 'utf-8':
-        sys.stdout.reconfigure(encoding='utf-8')
-    if sys.stderr.encoding.lower() != 'utf-8':
-        sys.stderr.reconfigure(encoding='utf-8')
+    if sys.stdout and sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+        sys.stdout.reconfigure(encoding="utf-8")
+    if sys.stderr and sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+        sys.stderr.reconfigure(encoding="utf-8")
 
 app = typer.Typer(name="prehistorian", help="Predictive codebase cartographer.")
 console = Console()
@@ -52,14 +51,15 @@ def query(file_path: str):
     if not model:
         console.print("[bold red]Model not found. Run `prehistorian scan` first.[/bold red]")
         raise typer.Exit(code=1)
-        
-    if file_path not in model.co_change_probabilities:
-        console.print(f"[yellow]No historical co-change data found for {file_path}.[/yellow]")
+
+    normalized_path = normalize_path(file_path)
+    if normalized_path not in model.co_change_probabilities:
+        console.print(f"[yellow]No historical co-change data found for {normalized_path}.[/yellow]")
         return
-        
-    rules = model.co_change_probabilities[file_path][:5]
-    
-    table = Table(title=f"Co-change Dependencies for '{file_path}'")
+
+    rules = model.co_change_probabilities[normalized_path][:5]
+
+    table = Table(title=f"Co-change Dependencies for '{normalized_path}'")
     table.add_column("File Path", style="cyan", no_wrap=True)
     table.add_column("Co-change Confidence (%)", justify="right", style="magenta")
     
@@ -109,11 +109,12 @@ def pre_commit_check():
             for rule in top_rules:
                 if rule.confidence >= 75.0 and rule.file_b not in staged_files:
                     # Warn the user
-                    panel = Panel(
-                        f"[yellow]You are committing '{staged_file}', but historically you also change '{rule.file_b}' {rule.confidence:.0f}% of the time. Did you forget to stage it?[/yellow]",
-                        title="[bold red]PREHISTORIAN WARNING[/bold red]",
-                        expand=False
+                    warning_text = (
+                        f"[bold yellow][PREHISTORIAN WARNING][/bold yellow] You are committing "
+                        f"'{staged_file}', but historically you also change '{rule.file_b}' "
+                        f"{rule.confidence:.0f}% of the time. Did you forget to stage it?"
                     )
+                    panel = Panel(warning_text, expand=False, border_style="yellow")
                     console.print(panel)
                     
     # ALWAYS EXIT 0 (Never block git commit)
