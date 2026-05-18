@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: prehistorian
+Version: 0.1.0
+Summary: A predictive codebase cartographer using Git history
+Author: Copilot
+Requires-Python: >=3.9
+Requires-Dist: typer>=0.9.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: scipy>=1.10.0
+Requires-Dist: mlxtend>=0.22.0
+Requires-Dist: joblib>=1.2.0

@@ -1,0 +1,2 @@
+[console_scripts]
+prehistorian = prehistorian.cli:app
