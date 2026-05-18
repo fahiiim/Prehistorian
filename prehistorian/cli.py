@@ -2,11 +2,17 @@ import typer
 import sys
 import os
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 from rich.table import Table
 from rich.panel import Panel
 
-from .git_parser import parse_git_history, get_latest_commit_hash, get_staged_files, normalize_path
+from .git_parser import (
+    parse_git_history,
+    get_latest_commit_hash,
+    get_staged_files,
+    normalize_path,
+    get_commit_count,
+)
 from .math_engine import train_model, save_model, load_model
 
 if sys.platform == "win32":
@@ -23,12 +29,24 @@ def scan():
     """Triggers the data pipeline and builds the co-change model."""
     with Progress(
         SpinnerColumn(),
+        BarColumn(),
+        TaskProgressColumn(),
         TextColumn("[progress.description]{task.description}"),
         transient=False,
     ) as progress:
-        task1 = progress.add_task("[cyan]Parsing Git history...", total=None)
-        
-        commits = parse_git_history()
+        total_commits = get_commit_count()
+        task1 = progress.add_task(
+            "[cyan]Parsing Git history...",
+            total=total_commits if total_commits > 0 else None,
+        )
+
+        def on_progress(count: int) -> None:
+            if total_commits > 0:
+                progress.update(task1, completed=count)
+            else:
+                progress.advance(task1)
+
+        commits = parse_git_history(progress_callback=on_progress)
         latest_hash = get_latest_commit_hash()
         progress.update(task1, description="[cyan]Parsing completed.")
         

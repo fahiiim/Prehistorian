@@ -1,5 +1,5 @@
 import subprocess
-from typing import List
+from typing import List, Optional, Callable
 from .models import CommitData
 
 NOISE_EXTENSIONS = {".svg", ".png", ".jpg", ".jpeg", ".gif", ".ico"}
@@ -27,15 +27,33 @@ def is_noise_file(filepath: str) -> bool:
 def get_latest_commit_hash() -> str:
     try:
         result = subprocess.run(
-            ['git', 'rev-parse', 'HEAD'],
-            capture_output=True, text=True, check=True
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
         )
         return result.stdout.strip()
     except subprocess.CalledProcessError:
         return ""
 
 
-def parse_git_history(max_files_per_commit: int = 15) -> List[CommitData]:
+def get_commit_count() -> int:
+    try:
+        result = subprocess.run(
+            ["git", "rev-list", "--all", "--count"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return int(result.stdout.strip() or 0)
+    except (subprocess.CalledProcessError, ValueError):
+        return 0
+
+
+def parse_git_history(
+    max_files_per_commit: int = 15,
+    progress_callback: Optional[Callable[[int], None]] = None,
+) -> List[CommitData]:
     try:
         result = subprocess.run(
             ["git", "log", "--all", "--name-only", "--pretty=format:COMMIT_START:%H"],
@@ -51,6 +69,7 @@ def parse_git_history(max_files_per_commit: int = 15) -> List[CommitData]:
     current_hash = ""
     current_files: List[str] = []
     current_raw_count = 0
+    commits_seen = 0
 
     for line in lines:
         line = line.strip()
@@ -66,6 +85,9 @@ def parse_git_history(max_files_per_commit: int = 15) -> List[CommitData]:
             current_hash = line.replace("COMMIT_START:", "")
             current_files = []
             current_raw_count = 0
+            commits_seen += 1
+            if progress_callback:
+                progress_callback(commits_seen)
         else:
             current_raw_count += 1
             normalized = normalize_path(line)
