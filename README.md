@@ -85,6 +85,75 @@ python -m prehistorian scan
 
 ---
 
+## Guided Usage
+
+### 1) Build the model
+
+Command:
+
+```bash
+prehistorian scan
+```
+
+Expected output:
+
+```
+Prehistorian analyzed 842 commits. Found 126 behavioral dependencies. Model saved.
+```
+
+### 2) Query co-change dependencies
+
+Command:
+
+```bash
+prehistorian query path/to/file.py
+```
+
+Expected output:
+
+```
+Co-change Dependencies for 'path/to/file.py'
+File Path                          Co-change Confidence (%)
+src/core/scheduler.py             88.24%
+src/core/config.py                75.61%
+```
+
+If there is no model yet:
+
+```
+Model not found. Run `prehistorian scan` first.
+```
+
+### 3) Install the pre-commit hook
+
+Command:
+
+```bash
+prehistorian hook-install
+```
+
+Expected output:
+
+```
+Successfully installed pre-commit hook at .git/hooks/pre-commit
+```
+
+### 4) Pre-commit check (runs automatically)
+
+Manual command (optional):
+
+```bash
+prehistorian pre-commit-check
+```
+
+Expected warning (commit never blocked):
+
+```
+[PREHISTORIAN WARNING] You are committing 'A', but historically you also change 'B' 85% of the time. Did you forget to stage it?
+```
+
+---
+
 ## Commands
 
 | Command | Description |
@@ -93,19 +162,6 @@ python -m prehistorian scan
 | `prehistorian query <file_path>` | Show top co-changing files and confidence. |
 | `prehistorian hook-install` | Install a git pre-commit hook. |
 | `prehistorian pre-commit-check` | Warn about missing co-changed files. |
-
----
-
-## Example Output
-
-```
-Prehistorian analyzed 842 commits. Found 126 behavioral dependencies. Model saved.
-
-Co-change Dependencies for 'src/core/engine.py'
-File Path                          Co-change Confidence (%)
-src/core/scheduler.py             88.24%
-src/core/config.py                75.61%
-```
 
 ---
 
@@ -122,6 +178,19 @@ python -m pytest
 ```
 
 GitHub Actions runs the tests on pushes and pull requests.
+
+---
+
+## Release (PyPI + GitHub)
+
+The release workflow publishes to PyPI and creates a GitHub Release when a version tag is pushed.
+
+For this release, use tag `1.1.2`:
+
+```bash
+git tag 1.1.2
+git push origin 1.1.2
+```
 
 ---
 
