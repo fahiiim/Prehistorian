@@ -57,14 +57,30 @@ Static imports and direct references show only explicit dependencies. Real-world
 
 ## Installation
 
+### From PyPI
+
 ```bash
-pip install .
+python -m pip install prehistorian
 ```
 
-Development dependencies:
+Upgrade:
 
 ```bash
-pip install .[dev]
+python -m pip install --upgrade prehistorian
+```
+
+### From source
+
+```bash
+git clone https://github.com/fahiiim/prehistorian.git
+cd prehistorian
+python -m pip install .
+```
+
+### Development install
+
+```bash
+python -m pip install -e .[dev]
 ```
 
 ---
