@@ -10,3 +10,5 @@ Requires-Dist: pandas>=2.0.0
 Requires-Dist: scipy>=1.10.0
 Requires-Dist: mlxtend>=0.22.0
 Requires-Dist: joblib>=1.2.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"

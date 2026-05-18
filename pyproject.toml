@@ -17,5 +17,14 @@ dependencies = [
     "joblib>=1.2.0"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0"
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
 [project.scripts]
 prehistorian = "prehistorian.cli:app"

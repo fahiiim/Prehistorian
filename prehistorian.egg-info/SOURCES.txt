@@ -12,3 +12,4 @@ prehistorian.egg-info/dependency_links.txt
 prehistorian.egg-info/entry_points.txt
 prehistorian.egg-info/requires.txt
 prehistorian.egg-info/top_level.txt
+tests/test_cli_smoke.py
