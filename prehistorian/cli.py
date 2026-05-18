@@ -9,6 +9,13 @@ from rich.panel import Panel
 from .git_parser import parse_git_history, get_latest_commit_hash, get_staged_files
 from .math_engine import train_model, save_model, load_model
 
+if sys.platform == "win32":
+    import codecs
+    if sys.stdout.encoding.lower() != 'utf-8':
+        sys.stdout.reconfigure(encoding='utf-8')
+    if sys.stderr.encoding.lower() != 'utf-8':
+        sys.stderr.reconfigure(encoding='utf-8')
+
 app = typer.Typer(name="prehistorian", help="Predictive codebase cartographer.")
 console = Console()
 
